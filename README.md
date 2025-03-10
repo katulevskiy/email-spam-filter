@@ -2,4 +2,15 @@
 
 Email spam filter
 
-Initial repository setup.
+## Installation
+
+```
+pip install -e .
+```
+
+## Usage
+
+```python
+from email_spam_filter import main
+main.main()
+```
