@@ -1,6 +1,9 @@
 import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv1D, MaxPooling1D, Flatten
+import cProfile
+import pstats
+from concurrent.futures import ProcessPoolExecutor
 
 def build_cnn_model(input_shape):
     """
@@ -40,7 +43,17 @@ def train_cnn_model(model, X_train, y_train, epochs=10, batch_size=32):
     Returns:
         History object containing training history information.
     """
-    return model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size)
+    profiler = cProfile.Profile()
+    profiler.enable()
+
+    # Train the model
+    history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size)
+
+    profiler.disable()
+    stats = pstats.Stats(profiler).sort_stats('cumtime')
+    stats.print_stats(10)  # Print top 10 time-consuming functions
+
+    return history
 
 def predict_spam(model, X_test):
     """
@@ -53,4 +66,16 @@ def predict_spam(model, X_test):
     Returns:
         Array of predicted probabilities indicating spam likelihood.
     """
-    return model.predict(X_test)
+    # Profile this function for performance bottlenecks
+    profiler = cProfile.Profile()
+    profiler.enable()
+
+    # Use ProcessPoolExecutor for parallel processing if applicable
+    with ProcessPoolExecutor() as executor:
+        results = list(executor.map(model.predict, np.array_split(X_test, os.cpu_count())))
+
+    profiler.disable()
+    stats = pstats.Stats(profiler).sort_stats('cumtime')
+    stats.print_stats(10)  # Print top 10 time-consuming functions
+
+    return np.concatenate(results)
