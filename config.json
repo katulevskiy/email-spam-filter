@@ -1,0 +1,5 @@
+{
+    "threshold": 0.7,
+    "whitelist": ["trusted@example.com"],
+    "blacklist": ["spammydomain.com"]
+}
