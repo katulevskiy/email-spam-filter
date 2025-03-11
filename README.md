@@ -35,20 +35,65 @@ Example `config.json`:
 
 ### Example Use Cases
 
-1. **Basic Filtering**:
-   - Run the filter on a set of emails to categorize them as spam or not.
+#### Basic Filtering
+
+1. **Run the filter on a set of emails**:
+   - Load your email data into the system.
+   - Execute the spam filter to categorize them as spam or not.
 
 2. **Custom Configuration**:
-   - Set up specific rules in your configuration file and see how they affect email classification.
+   - Edit `config.json` with specific rules.
+   - Observe how these settings affect email classification.
 
-3. **Integration with Email Clients**:
-   - Use this library in conjunction with popular email clients for automated spam filtering.
+#### Integration with Email Clients
+
+- **Integrate with Gmail**:
+
+  1. Set up a Google Cloud Project and enable the Gmail API.
+  2. Install the necessary client library: 
+     ```bash
+     pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+     ```
+  3. Use OAuth to authenticate and access your Gmail account.
+  4. Filter incoming emails through the spam filter before they reach your inbox.
+
+- **Integrate with Outlook**:
+
+  1. Create an app registration in Azure Active Directory for accessing Microsoft Graph API.
+  2. Install MSAL (Microsoft Authentication Library) for Python:
+     ```bash
+     pip install msal
+     ```
+  3. Use OAuth to authenticate and access your Outlook account.
+  4. Apply the spam filter to incoming emails using the Microsoft Graph API.
+
+#### Automated Workflows
+
+- **Setup with Cron Jobs**:
+
+  1. Write a script that pulls new emails from your mailbox at regular intervals.
+  2. Use cron jobs to schedule this script:
+     ```bash
+     crontab -e
+     ```
+  3. Add a line to execute the script every hour, for example:
+     ```bash
+     0 * * * * /usr/bin/python3 /path/to/your/script.py
+     ```
+
+- **Using Zapier**:
+
+  1. Create a Zap that triggers on new emails in Gmail.
+  2. Use Webhooks by Zapier to send email data to your filter.
+  3. Process the emails and update their status based on the spam filter's output.
 
 ### Troubleshooting Tips
 
-- **Installation Issues**: Ensure you have the correct Python version installed.
-- **Configuration Errors**: Double-check syntax in your configuration file.
-- **Filtering Performance**: Experiment with different threshold values to fine-tune performance.
+- **Installation Issues**: Ensure you have the correct Python version installed. Check for any missing dependencies in the error messages and install them using pip.
+
+- **Configuration Errors**: Double-check syntax in your configuration file. Make sure JSON is properly formatted, with matching braces and quotes.
+
+- **Filtering Performance**: Experiment with different threshold values to fine-tune performance. Adjust the sensitivity settings based on the spam characteristics of your email traffic.
 
 ## Testing Suite
 
