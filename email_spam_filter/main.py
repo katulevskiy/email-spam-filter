@@ -1,20 +1,50 @@
 """Main module for optimized email-spam-filter."""
 
 import os
+import json
 from concurrent.futures import ProcessPoolExecutor
 import cProfile
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+class ConfigReloader(FileSystemEventHandler):
+    """Handler to reload configuration when file changes are detected."""
+    
+    def __init__(self, config_path, callback):
+        self.config_path = config_path
+        self.callback = callback
+    
+    def on_modified(self, event):
+        if event.src_path == self.config_path:
+            self.callback()
 
 class SpamFilter:
     """Class for handling multiple spam detection algorithms."""
     
-    def __init__(self, algorithm='naive_bayes'):
-        """Initialize with a default or specified algorithm."""
+    def __init__(self, algorithm='naive_bayes', config_path='config.json'):
+        """Initialize with a default or specified algorithm and configuration path."""
         self.algorithm = algorithm
         self.algorithms = {
             'naive_bayes': self._naive_bayes_filter,
             'svm': self._svm_filter,
             # Additional algorithms can be added here
         }
+        self.config_path = config_path
+        self.load_config()
+        
+        # Set up file watcher to reload configuration on changes
+        event_handler = ConfigReloader(config_path, self.load_config)
+        observer = Observer()
+        observer.schedule(event_handler, path=os.path.dirname(config_path), recursive=False)
+        observer.start()
+
+    def load_config(self):
+        """Load configurations from the config.json file."""
+        with open(self.config_path, 'r') as f:
+            config = json.load(f)
+            # Assuming we want to update algorithm based on config
+            if 'algorithm' in config:
+                self.algorithm = config['algorithm']
     
     def run_spam_filter(self, email_content):
         """Run the selected spam detection algorithm on the given content."""
